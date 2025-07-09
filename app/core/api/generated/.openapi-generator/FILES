@@ -1,0 +1,17 @@
+.openapi-generator-ignore
+apis/AuthApi.ts
+apis/TaskApi.ts
+apis/TeamApi.ts
+apis/index.ts
+index.ts
+models/ChangePasswordDto.ts
+models/CreateTaskDto.ts
+models/CreateTeamDto.ts
+models/GetTeamDto.ts
+models/LoginDto.ts
+models/RegisterDto.ts
+models/TaskItemDto.ts
+models/UpdateTaskDto.ts
+models/UpdateTeamDto.ts
+models/index.ts
+runtime.ts

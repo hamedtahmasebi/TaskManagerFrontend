@@ -15,11 +15,14 @@
 
 import * as runtime from '../runtime';
 import type {
+  AuthResponseDto,
   ChangePasswordDto,
   LoginDto,
   RegisterDto,
 } from '../models/index';
 import {
+    AuthResponseDtoFromJSON,
+    AuthResponseDtoToJSON,
     ChangePasswordDtoFromJSON,
     ChangePasswordDtoToJSON,
     LoginDtoFromJSON,
@@ -76,7 +79,7 @@ export class AuthApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiAuthLoginPostRaw(requestParameters: ApiAuthLoginPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async apiAuthLoginPostRaw(requestParameters: ApiAuthLoginPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AuthResponseDto>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -94,13 +97,14 @@ export class AuthApi extends runtime.BaseAPI {
             body: LoginDtoToJSON(requestParameters['loginDto']),
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => AuthResponseDtoFromJSON(jsonValue));
     }
 
     /**
      */
-    async apiAuthLoginPost(requestParameters: ApiAuthLoginPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiAuthLoginPostRaw(requestParameters, initOverrides);
+    async apiAuthLoginPost(requestParameters: ApiAuthLoginPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AuthResponseDto> {
+        const response = await this.apiAuthLoginPostRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**
@@ -131,7 +135,7 @@ export class AuthApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiAuthRegisterPostRaw(requestParameters: ApiAuthRegisterPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async apiAuthRegisterPostRaw(requestParameters: ApiAuthRegisterPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AuthResponseDto>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -149,13 +153,14 @@ export class AuthApi extends runtime.BaseAPI {
             body: RegisterDtoToJSON(requestParameters['registerDto']),
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => AuthResponseDtoFromJSON(jsonValue));
     }
 
     /**
      */
-    async apiAuthRegisterPost(requestParameters: ApiAuthRegisterPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiAuthRegisterPostRaw(requestParameters, initOverrides);
+    async apiAuthRegisterPost(requestParameters: ApiAuthRegisterPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AuthResponseDto> {
+        const response = await this.apiAuthRegisterPostRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
 }

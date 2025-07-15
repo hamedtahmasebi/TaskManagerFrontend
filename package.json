@@ -10,6 +10,7 @@
         "generate-swagger-api": "openapi-generator-cli generate   -i swagger.json   -g typescript-fetch   -o ./app/core/api/generated   --additional-properties=useSingleRequestParameter=true,supportsES6=true,modelPropertyNaming=original,withSeparateModelsAndApi=true,apiPackage=apis,modelPackage=models"
     },
     "dependencies": {
+        "@hookform/resolvers": "^5.1.1",
         "@radix-ui/react-accordion": "^1.2.11",
         "@radix-ui/react-checkbox": "^1.3.2",
         "@radix-ui/react-collapsible": "^1.1.11",
@@ -22,6 +23,8 @@
         "@react-router/node": "^7.5.3",
         "@react-router/serve": "^7.5.3",
         "@tailwindcss/postcss": "^4.1.11",
+        "@tanstack/react-query": "^5.83.0",
+        "@uidotdev/usehooks": "^2.4.1",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "date-fns": "^4.1.0",
@@ -32,9 +35,13 @@
         "react": "^19.1.0",
         "react-day-picker": "^9.8.0",
         "react-dom": "^19.1.0",
+        "react-hook-form": "^7.60.0",
         "react-router": "^7.5.3",
         "sonner": "^2.0.6",
-        "tailwind-merge": "^3.3.1"
+        "tailwind-merge": "^3.3.1",
+        "tw-animate-css": "^1.3.5",
+        "zod": "^4.0.5",
+        "zustand": "^5.0.6"
     },
     "devDependencies": {
         "@react-router/dev": "^7.5.3",

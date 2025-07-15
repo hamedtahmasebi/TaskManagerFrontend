@@ -1,5 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
+export * from './AuthResponseDto';
 export * from './ChangePasswordDto';
 export * from './CreateTaskDto';
 export * from './CreateTeamDto';

@@ -3,7 +3,9 @@ import { Configuration } from "./generated";
 import { AuthApi, TaskApi, TeamApi } from "./generated/apis";
 
 const config: Configuration = new Configuration({
-    accessToken: () => useAuthStore.getState().accessToken ?? "",
+    headers: {
+        authorization: `Bearer ${useAuthStore.getState().accessToken ?? ""}`,
+    },
     basePath: "http://localhost:5010",
 });
 

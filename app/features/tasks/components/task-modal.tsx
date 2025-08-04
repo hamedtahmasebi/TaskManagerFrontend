@@ -14,13 +14,14 @@ import {
     DialogPortal,
     DialogContent,
 } from "~/components/ui/dialog";
+import { Button } from "~/components/ui/button";
 
 interface TaskModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSubmit: (data: CreateTaskDto | UpdateTaskDto) => void;
     task?: TaskItemDto | null;
-    mode: "create" | "edit";
+    pendingSubmit?: boolean;
 }
 
 const priorityOptions = ["Low", "Medium", "High"];
@@ -36,7 +37,7 @@ export function TaskModal({
     onClose,
     onSubmit,
     task,
-    mode,
+    pendingSubmit,
 }: TaskModalProps) {
     const {
         register,
@@ -46,7 +47,7 @@ export function TaskModal({
     } = useForm<CreateTaskDto>();
 
     useEffect(() => {
-        if (task && mode === "edit") {
+        if (task) {
             reset({
                 title: task.title,
                 content: task.content || "",
@@ -61,7 +62,7 @@ export function TaskModal({
                 priority: "",
             });
         }
-    }, [task, mode, reset]);
+    }, [task, reset]);
 
     const onFormSubmit = (data: CreateTaskDto) => {
         onSubmit(data);
@@ -76,7 +77,7 @@ export function TaskModal({
                 <DialogContent>
                     <DialogHeader>
                         <h2 className="text-xl font-semibold">
-                            {mode === "create" ? "Add New Task" : "Edit Task"}
+                            {task ? "Edit Task" : "Add New Task"}
                         </h2>
                     </DialogHeader>
                     <form
@@ -162,20 +163,21 @@ export function TaskModal({
 
                         <div className="flex justify-end space-x-3 pt-4">
                             <button
+                                disabled={pendingSubmit}
                                 type="button"
                                 onClick={onClose}
                                 className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
                             >
                                 Cancel
                             </button>
-                            <button
+                            <Button isLoading={pendingSubmit}>
+                                {task ? "Update Task" : "Create Task"}
+                            </Button>
+                            {/* <button
                                 type="submit"
                                 className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors"
                             >
-                                {mode === "create"
-                                    ? "Create Task"
-                                    : "Update Task"}
-                            </button>
+                            </button> */}
                         </div>
                     </form>
                 </DialogContent>

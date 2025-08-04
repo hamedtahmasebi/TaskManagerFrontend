@@ -2,15 +2,26 @@ import { useAuthStore } from "~/features/auth/store";
 import { Configuration } from "./generated";
 import { AuthApi, TaskApi, TeamApi } from "./generated/apis";
 
-const config: Configuration = new Configuration({
-    headers: {
-        authorization: `Bearer ${useAuthStore.getState().accessToken ?? ""}`,
-    },
-    basePath: "http://localhost:5010",
-});
+export class Api {
+    static get Auth() {
+        return new AuthApi(this.getConfig());
+    }
+    static get Task() {
+        return new TaskApi(this.getConfig());
+    }
+    static get Team() {
+        return new TeamApi(this.getConfig());
+    }
 
-export const Api = {
-    Auth: new AuthApi(config),
-    Task: new TaskApi(config),
-    Team: new TeamApi(config),
-};
+    private static getConfig() {
+        const config: Configuration = new Configuration({
+            headers: {
+                authorization: `Bearer ${
+                    useAuthStore.getState().accessToken ?? ""
+                }`,
+            },
+            basePath: "http://localhost:5010",
+        });
+        return config;
+    }
+}

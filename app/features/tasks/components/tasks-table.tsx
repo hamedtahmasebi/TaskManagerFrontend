@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
     useReactTable,
     getCoreRowModel,
@@ -27,7 +27,12 @@ import {
     type UpdateTaskDto,
 } from "~/core/api/generated";
 import { TaskModal } from "./task-modal";
-import { Api } from "~/core/api";
+import {
+    useCreateTask,
+    useDeleteTask,
+    useGetTasks,
+    useUpdateTask,
+} from "../api/hooks";
 
 const columnHelper = createColumnHelper<TaskItemDto>();
 
@@ -38,15 +43,21 @@ const priorityColors = {
 };
 
 export function TasksTable() {
-    const [tasks, setTasks] = useState<TaskItemDto[]>([]);
-    const [loading, setLoading] = useState(true);
+    const { data: tasks, isLoading } = useGetTasks({ page: 1, size: 10 });
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [globalFilter, setGlobalFilter] = useState("");
 
+    // API
+    const { mutateAsync: deleteTask, isPending: isPendingDelete } =
+        useDeleteTask();
+    const { mutateAsync: updateTask, isPending: isPendingUpdate } =
+        useUpdateTask();
+    const { mutateAsync: createTask, isPending: isPendingCreate } =
+        useCreateTask();
+
     // Modal state
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [modalMode, setModalMode] = useState<"create" | "edit">("create");
     const [selectedTask, setSelectedTask] = useState<TaskItemDto | null>(null);
 
     const columns = [
@@ -139,7 +150,11 @@ export function TasksTable() {
                         <Edit className="h-4 w-4" />
                     </button>
                     <button
-                        onClick={() => handleDeleteTask(+info.row.original.id)}
+                        onClick={() => {
+                            if (info.row.original.id) {
+                                deleteTask(+info.row.original.id);
+                            }
+                        }}
                         className="text-red-600 hover:text-red-800 transition-colors"
                     >
                         <Trash2 className="h-4 w-4" />
@@ -150,7 +165,7 @@ export function TasksTable() {
     ];
 
     const table = useReactTable({
-        data: tasks,
+        data: tasks ?? [],
         columns,
         state: {
             sorting,
@@ -165,68 +180,31 @@ export function TasksTable() {
         getFilteredRowModel: getFilteredRowModel(),
     });
 
-    useEffect(() => {
-        loadTasks();
-    }, []);
-
-    const loadTasks = async () => {
-        try {
-            setLoading(true);
-            const data = await Api.Task.apiTaskGet();
-            setTasks(data);
-        } catch (error) {
-            console.error("Failed to load tasks:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     const handleCreateTask = () => {
-        setModalMode("create");
         setSelectedTask(null);
         setIsModalOpen(true);
     };
 
     const handleEditTask = (task: TaskItemDto) => {
-        setModalMode("edit");
         setSelectedTask(task);
         setIsModalOpen(true);
     };
 
-    const handleDeleteTask = async (id: number) => {
-        if (window.confirm("Are you sure you want to delete this task?")) {
-            try {
-                await Api.Task.apiTaskIdDelete({ id });
-                setTasks(tasks.filter((task) => task.id !== id));
-            } catch (error) {
-                console.error("Failed to delete task:", error);
-            }
-        }
-    };
-
     const handleModalSubmit = async (data: CreateTaskDto | UpdateTaskDto) => {
-        try {
-            if (modalMode === "create") {
-                await Api.Task.apiTaskPost({
-                    createTaskDto: {
-                        title: data.title ?? "",
-                        content: data.content ?? "",
-                        deadline: new Date(),
-                        priority: data.priority,
-                    },
-                });
-            } else if (selectedTask) {
-                await Api.Task.apiTaskIdPatch({
-                    id: selectedTask.id as number,
-                    updateTaskDto: data as UpdateTaskDto,
-                });
-            }
-        } catch (error) {
-            console.error("Failed to save task:", error);
+        if (selectedTask?.id) {
+            console.log(data);
+            await updateTask({ id: selectedTask.id, data });
+        } else {
+            await createTask({
+                title: data.title ?? "",
+                content: data.content ?? "",
+                deadline: new Date(),
+                priority: data.priority,
+            });
         }
     };
 
-    if (loading) {
+    if (isLoading) {
         return (
             <div className="flex items-center justify-center h-64">
                 <div className="text-gray-500">Loading tasks...</div>
@@ -339,7 +317,6 @@ export function TasksTable() {
                 onClose={() => setIsModalOpen(false)}
                 onSubmit={handleModalSubmit}
                 task={selectedTask}
-                mode={modalMode}
             />
         </div>
     );

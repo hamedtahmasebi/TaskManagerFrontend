@@ -28,6 +28,14 @@ import {
     UpdateTaskDtoToJSON,
 } from '../models/index';
 
+export interface ApiTaskGetRequest {
+    searchString?: string;
+    sortBy?: Array<string>;
+    sortDirection?: Array<string>;
+    page?: number;
+    size?: number;
+}
+
 export interface ApiTaskIdDeleteRequest {
     id: number;
 }
@@ -52,8 +60,28 @@ export class TaskApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiTaskGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TaskItemDto>>> {
+    async apiTaskGetRaw(requestParameters: ApiTaskGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<TaskItemDto>>> {
         const queryParameters: any = {};
+
+        if (requestParameters['searchString'] != null) {
+            queryParameters['SearchString'] = requestParameters['searchString'];
+        }
+
+        if (requestParameters['sortBy'] != null) {
+            queryParameters['SortBy'] = requestParameters['sortBy'];
+        }
+
+        if (requestParameters['sortDirection'] != null) {
+            queryParameters['SortDirection'] = requestParameters['sortDirection'];
+        }
+
+        if (requestParameters['page'] != null) {
+            queryParameters['Page'] = requestParameters['page'];
+        }
+
+        if (requestParameters['size'] != null) {
+            queryParameters['Size'] = requestParameters['size'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -72,8 +100,8 @@ export class TaskApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiTaskGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TaskItemDto>> {
-        const response = await this.apiTaskGetRaw(initOverrides);
+    async apiTaskGet(requestParameters: ApiTaskGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<TaskItemDto>> {
+        const response = await this.apiTaskGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
